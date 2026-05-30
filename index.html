@@ -1650,25 +1650,24 @@
     if (!snapshot) return;
 
     const html = buildReportHTML(snapshot);
-    const reportWindow = window.open('', '_blank');
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const reportWindow = window.open(url, '_blank');
+
     if (reportWindow) {
-      reportWindow.document.open();
-      reportWindow.document.write(html);
-      reportWindow.document.close();
       reportWindow.focus();
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
       addEvent('info', 'Reporte generado', 'Se abrió un informe estructurado con las lecturas actuales y el registro reciente.');
       return;
     }
 
-    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
     link.download = `reporte_horno_industrial_${fileTimestamp(new Date())}.html`;
     document.body.appendChild(link);
     link.click();
     link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
     addEvent('info', 'Reporte descargado', 'El navegador bloqueó la ventana emergente, por eso se descargó el archivo HTML.');
   }
 
@@ -1678,7 +1677,7 @@
     const stateClass = report.state === 'safe' ? 'ok' : report.state === 'attention' || report.state === 'restricted' ? 'warn' : report.state === 'failure' ? 'neutral' : 'danger';
     const trend = getTrendSummary(report.history);
     const recommendations = recommendationForReport(report.state, report.risk);
-    const faviconHref = new URL('icons/horno.jpg', window.location.href).href;
+    const faviconHref = 'data:image/png;base64,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';
     const eventRows = report.events.slice(0, 8).map((event, index) => {
       const detail = event.desc ? escapeHTML(event.desc).slice(0, 95) : '';
       return `
