@@ -1,0 +1,2068 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Panel Ejecutivo | Seguridad de Horno Industrial</title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    :root {
+      --bg: #f3f6fb;
+      --surface: #ffffff;
+      --surface-2: #f8fafc;
+      --surface-3: #eef2f7;
+      --ink: #0f172a;
+      --text: #1f2937;
+      --muted: #64748b;
+      --muted-2: #94a3b8;
+      --line: #dbe3ef;
+      --line-2: #cbd5e1;
+      --primary: #0f3f75;
+      --primary-2: #155e9f;
+      --primary-soft: #e6f0fb;
+      --success: #047857;
+      --success-soft: #e6f6ef;
+      --warning: #b45309;
+      --warning-soft: #fff5df;
+      --danger: #b91c1c;
+      --danger-soft: #fff1f2;
+      --neutral: #475569;
+      --neutral-soft: #f1f5f9;
+      --shadow: 0 18px 50px rgba(15, 23, 42, .08);
+      --shadow-soft: 0 8px 24px rgba(15, 23, 42, .06);
+      --radius-lg: 22px;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, rgba(15,63,117,.08), transparent 280px),
+        var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.45;
+    }
+
+    button, input, select { font: inherit; }
+
+    .app {
+      display: grid;
+      grid-template-columns: 272px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      background: #0f172a;
+      color: #e5edf8;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      border-right: 1px solid rgba(255,255,255,.08);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+    }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #155e9f, #0f3f75);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 12px 24px rgba(0,0,0,.22);
+    }
+
+    .brand-mark svg { width: 25px; height: 25px; }
+
+    .brand-name {
+      font-size: 15px;
+      font-weight: 850;
+      letter-spacing: -.01em;
+    }
+
+    .brand-sub {
+      color: #9aa8bd;
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .nav-section-title {
+      text-transform: uppercase;
+      letter-spacing: .11em;
+      color: #7e8ca3;
+      font-size: 10px;
+      font-weight: 850;
+      margin-bottom: 10px;
+    }
+
+    .nav-list {
+      display: grid;
+      gap: 6px;
+      list-style: none;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 11px;
+      border-radius: 12px;
+      color: #b8c3d6;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      transition: background .18s ease, color .18s ease, transform .18s ease;
+    }
+
+    .nav-item:hover {
+      color: #ffffff;
+      background: rgba(255,255,255,.06);
+    }
+
+    .nav-item:focus-visible {
+      outline: 3px solid rgba(96,165,250,.38);
+      outline-offset: 2px;
+    }
+
+    .nav-item.active {
+      color: #ffffff;
+      background: rgba(21, 94, 159, .42);
+      box-shadow: inset 0 0 0 1px rgba(147,197,253,.16);
+    }
+
+    .nav-icon {
+      width: 18px;
+      height: 18px;
+      display: inline-grid;
+      place-items: center;
+      opacity: .92;
+    }
+
+    .shortcut-card {
+      margin-top: auto;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      padding: 14px;
+      color: #cbd5e1;
+    }
+
+    .shortcut-card strong {
+      display: block;
+      color: #f8fafc;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .shortcut-card p {
+      font-size: 12px;
+      color: #a6b3c7;
+      margin-bottom: 12px;
+    }
+
+    .key-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .keycap {
+      min-width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: inline-grid;
+      place-items: center;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.12);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .content {
+      min-width: 0;
+      padding: 22px;
+    }
+
+    .topbar {
+      background: rgba(255,255,255,.78);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(203, 213, 225, .80);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      padding: 18px 20px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      color: var(--primary-2);
+      font-size: 11px;
+      font-weight: 900;
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      color: var(--ink);
+      font-size: clamp(24px, 3vw, 36px);
+      line-height: 1.08;
+      letter-spacing: -.04em;
+      font-weight: 900;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 7px;
+      max-width: 76ch;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .clock-card {
+      display: grid;
+      gap: 2px;
+      text-align: right;
+      color: var(--muted);
+      font-size: 12px;
+      min-width: 132px;
+    }
+
+    .clock-card strong {
+      color: var(--ink);
+      font-size: 16px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .btn {
+      border: 1px solid var(--line-2);
+      background: var(--surface);
+      color: var(--ink);
+      border-radius: 12px;
+      min-height: 40px;
+      padding: 9px 13px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease, background .16s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: #9eb4d0;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, .08);
+    }
+
+    .btn.primary {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    .btn.ghost {
+      background: #f8fafc;
+    }
+
+    .status-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(330px, .75fr);
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .panel-body { padding: 20px; }
+
+    .panel-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: linear-gradient(180deg, #ffffff, #f8fafc);
+    }
+
+    .panel-title {
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      color: var(--muted);
+    }
+
+    .panel-caption {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .operational-card {
+      position: relative;
+      min-height: 318px;
+    }
+
+    .status-band {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 8px;
+      background: var(--success);
+    }
+
+    .operational-card.attention .status-band { background: var(--warning); }
+    .operational-card.restricted .status-band,
+    .operational-card.emergency .status-band { background: var(--danger); }
+    .operational-card.failure .status-band { background: var(--neutral); }
+
+    .status-content {
+      padding: 28px 28px 24px 32px;
+      display: grid;
+      gap: 24px;
+      height: 100%;
+    }
+
+    .status-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .status-label {
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .status-name {
+      color: var(--ink);
+      font-size: clamp(32px, 4.8vw, 58px);
+      line-height: .95;
+      letter-spacing: -.06em;
+      font-weight: 950;
+    }
+
+    .status-desc {
+      color: var(--muted);
+      max-width: 70ch;
+      font-size: 15px;
+      margin-top: 12px;
+    }
+
+    .status-badge {
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 900;
+      color: var(--success);
+      background: var(--success-soft);
+      border: 1px solid rgba(4, 120, 87, .18);
+      white-space: nowrap;
+    }
+
+    .status-badge.attention { color: var(--warning); background: var(--warning-soft); border-color: rgba(180, 83, 9, .18); }
+    .status-badge.restricted,
+    .status-badge.emergency { color: var(--danger); background: var(--danger-soft); border-color: rgba(185, 28, 28, .18); }
+    .status-badge.failure { color: var(--neutral); background: var(--neutral-soft); border-color: rgba(71, 85, 105, .18); }
+
+    .status-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: auto;
+    }
+
+    .mini-stat {
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--surface-2);
+      padding: 12px;
+      min-height: 82px;
+    }
+
+    .mini-stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 8px;
+    }
+
+    .mini-stat strong {
+      color: var(--ink);
+      font-size: 21px;
+      font-weight: 950;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .mini-stat small {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .risk-card .panel-body {
+      display: grid;
+      gap: 18px;
+      min-height: 262px;
+    }
+
+    .gauge-wrap {
+      display: grid;
+      place-items: center;
+      position: relative;
+      min-height: 164px;
+    }
+
+    .gauge {
+      width: min(260px, 100%);
+      height: auto;
+    }
+
+    .gauge-bg {
+      fill: none;
+      stroke: #e2e8f0;
+      stroke-width: 16;
+      stroke-linecap: round;
+    }
+
+    .gauge-value {
+      fill: none;
+      stroke: var(--success);
+      stroke-width: 16;
+      stroke-linecap: round;
+      stroke-dasharray: 282;
+      stroke-dashoffset: 282;
+      transition: stroke-dashoffset .45s ease, stroke .25s ease;
+    }
+
+    .gauge-center {
+      position: absolute;
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .gauge-center strong {
+      display: block;
+      color: var(--ink);
+      font-size: 44px;
+      line-height: 1;
+      font-weight: 950;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -.05em;
+    }
+
+    .gauge-center span {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    .risk-summary {
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--surface-2);
+      padding: 14px;
+    }
+
+    .risk-summary strong {
+      display: block;
+      color: var(--ink);
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .risk-summary p {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .health-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .health-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .health-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: var(--success);
+      box-shadow: 0 0 0 5px rgba(4, 120, 87, .12);
+      flex: 0 0 auto;
+    }
+
+    .health-card.warn .health-dot { background: var(--warning); box-shadow: 0 0 0 5px rgba(180, 83, 9, .13); }
+    .health-card.dead .health-dot { background: var(--danger); box-shadow: 0 0 0 5px rgba(185, 28, 28, .13); }
+    .health-card.info .health-dot { background: var(--primary-2); box-shadow: 0 0 0 5px rgba(21, 94, 159, .11); }
+
+    .health-copy { min-width: 0; }
+    .health-copy span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .health-copy strong {
+      display: block;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 900;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 3px;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .metric {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow-soft);
+      min-width: 0;
+    }
+
+    .metric-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .metric-title {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .metric-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: var(--primary-soft);
+      color: var(--primary);
+      flex: 0 0 auto;
+    }
+
+    .metric-value {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+      color: var(--ink);
+      font-size: 34px;
+      line-height: .95;
+      font-weight: 950;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -.04em;
+    }
+
+    .metric-value small {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 850;
+      letter-spacing: normal;
+    }
+
+    .metric-foot {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 10px;
+      min-height: 17px;
+    }
+
+    .metric-line {
+      height: 5px;
+      border-radius: 999px;
+      background: var(--surface-3);
+      overflow: hidden;
+      margin-top: 13px;
+    }
+
+    .metric-line i {
+      display: block;
+      height: 100%;
+      width: 0;
+      border-radius: 999px;
+      background: var(--primary);
+      transition: width .35s ease, background .25s ease;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.12fr) minmax(360px, .88fr);
+      gap: 18px;
+    }
+
+    .chart-wrap {
+      height: 320px;
+      background: linear-gradient(180deg, #ffffff, #f8fafc);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 12px;
+    }
+
+    canvas { width: 100%; height: 100%; display: block; }
+
+    .process-flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .flow-step {
+      position: relative;
+      border: 1px solid var(--line);
+      background: var(--surface-2);
+      border-radius: 15px;
+      padding: 12px;
+      min-height: 104px;
+    }
+
+    .flow-step::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: -10px;
+      width: 10px;
+      height: 2px;
+      background: var(--line-2);
+    }
+
+    .flow-step:last-child::after { display: none; }
+
+    .flow-step span {
+      display: inline-grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 10px;
+      background: var(--primary);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 900;
+      margin-bottom: 9px;
+    }
+
+    .flow-step strong {
+      display: block;
+      color: var(--ink);
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .flow-step small {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .mode-btn {
+      min-height: 72px;
+      border: 1px solid var(--line);
+      background: var(--surface-2);
+      border-radius: 16px;
+      padding: 12px;
+      cursor: pointer;
+      text-align: left;
+      transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease, background .16s ease;
+    }
+
+    .mode-btn:hover {
+      transform: translateY(-1px);
+      border-color: #9eb4d0;
+      box-shadow: 0 10px 20px rgba(15,23,42,.08);
+    }
+
+    .mode-btn.active {
+      border-color: rgba(15, 63, 117, .55);
+      background: #edf5ff;
+      box-shadow: 0 0 0 4px rgba(21, 94, 159, .10);
+    }
+
+    .mode-btn.danger.active { border-color: rgba(185, 28, 28, .55); background: var(--danger-soft); box-shadow: 0 0 0 4px rgba(185, 28, 28, .09); }
+    .mode-btn.warn.active { border-color: rgba(180, 83, 9, .55); background: var(--warning-soft); box-shadow: 0 0 0 4px rgba(180, 83, 9, .09); }
+    .mode-btn.neutral.active { border-color: rgba(71, 85, 105, .55); background: var(--neutral-soft); box-shadow: 0 0 0 4px rgba(71, 85, 105, .08); }
+
+    .mode-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .mode-key {
+      width: 28px;
+      height: 28px;
+      border-radius: 9px;
+      display: inline-grid;
+      place-items: center;
+      border: 1px solid var(--line-2);
+      background: #ffffff;
+      color: var(--primary);
+      font-weight: 950;
+      font-size: 12px;
+    }
+
+    .mode-label {
+      color: var(--ink);
+      font-weight: 900;
+      font-size: 14px;
+    }
+
+    .mode-btn p {
+      color: var(--muted);
+      font-size: 12px;
+      margin: 0;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 680px;
+      background: #ffffff;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    th {
+      background: var(--surface-2);
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: 10px;
+      font-weight: 950;
+    }
+
+    td {
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 900;
+      border: 1px solid transparent;
+    }
+
+    .pill.ok { color: var(--success); background: var(--success-soft); border-color: rgba(4,120,87,.18); }
+    .pill.warn { color: var(--warning); background: var(--warning-soft); border-color: rgba(180,83,9,.18); }
+    .pill.danger { color: var(--danger); background: var(--danger-soft); border-color: rgba(185,28,28,.18); }
+    .pill.neutral { color: var(--neutral); background: var(--neutral-soft); border-color: rgba(71,85,105,.18); }
+    .pill.info { color: var(--primary); background: var(--primary-soft); border-color: rgba(21,94,159,.18); }
+
+    .events {
+      display: grid;
+      gap: 10px;
+      max-height: 416px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .event {
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--surface-2);
+      padding: 12px;
+      display: grid;
+      gap: 7px;
+    }
+
+    .event-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .event-title {
+      color: var(--ink);
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .event-time {
+      color: var(--muted);
+      font-size: 11px;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .event-desc {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .split-stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    footer {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+      padding: 28px 12px 10px;
+    }
+
+    @media print {
+      body { background: #ffffff; }
+      .sidebar, .top-actions, .controls-panel { display: none !important; }
+      .app { display: block; }
+      .content { padding: 0; }
+      .topbar, .panel, .metric, .health-card { box-shadow: none; }
+      .content-grid, .status-hero, .metrics-grid, .health-row { grid-template-columns: 1fr 1fr; }
+      .chart-wrap { height: 240px; }
+    }
+
+    @media (max-width: 1120px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar {
+        position: static;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid rgba(255,255,255,.08);
+      }
+      .nav-list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .shortcut-card { margin-top: 0; }
+      .status-hero, .content-grid { grid-template-columns: 1fr; }
+      .health-row, .metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 720px) {
+      .content { padding: 14px; }
+      .topbar { grid-template-columns: 1fr; }
+      .top-actions { justify-content: flex-start; }
+      .clock-card { text-align: left; }
+      .status-stats, .metrics-grid, .health-row, .process-flow, .controls { grid-template-columns: 1fr; }
+      .flow-step::after { display: none; }
+      .nav-list { grid-template-columns: 1fr 1fr; }
+      .status-content { padding: 24px 20px 20px 26px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" aria-label="Navegación principal">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 2.75l7.25 3v5.75c0 4.65-2.97 8.87-7.25 10-4.28-1.13-7.25-5.35-7.25-10V5.75L12 2.75z" stroke="white" stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M8.5 12.2l2.2 2.2 4.9-5.1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <div>
+          <div class="brand-name">Industrial Safety</div>
+          <div class="brand-sub">Horno Industrial 01</div>
+        </div>
+      </div>
+
+      <nav>
+        <div class="nav-section-title">Panel</div>
+        <ul class="nav-list">
+          <li class="nav-item active" data-nav="operacion" role="button" tabindex="0"><span class="nav-icon">●</span> Operación</li>
+          <li class="nav-item" data-nav="sensores" role="button" tabindex="0"><span class="nav-icon">●</span> Sensores</li>
+          <li class="nav-item" data-nav="eventos" role="button" tabindex="0"><span class="nav-icon">●</span> Eventos</li>
+          <li class="nav-item" data-nav="reportes" role="button" tabindex="0"><span class="nav-icon">●</span> Reportes</li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Centro de monitoreo</div>
+          <h1>Panel Ejecutivo de Seguridad Operacional</h1>
+          <p class="subtitle">Monitoreo local de sensores, compuerta de seguridad, conectividad y registro de eventos para el horno industrial.</p>
+        </div>
+        <div class="top-actions">
+          <div class="clock-card">
+            <span>Fecha y hora local</span>
+            <strong id="clock">--:--:--</strong>
+          </div>
+          <button class="btn ghost" id="btn-reset" type="button">Limpiar eventos</button>
+          <button class="btn primary" id="btn-print" type="button">Generar reporte</button>
+        </div>
+      </header>
+
+      <section class="status-hero" id="operacion" aria-label="Estado principal">
+        <article class="panel operational-card safe" id="operation-panel">
+          <div class="status-band"></div>
+          <div class="status-content">
+            <div class="status-top">
+              <div>
+                <div class="status-label">Estado operativo</div>
+                <div class="status-name" id="estado-texto">OPERACIÓN SEGURA</div>
+                <p class="status-desc" id="estado-subtitulo">Condiciones nominales. No se detecta presencia en el área restringida y la temperatura se mantiene dentro del rango permitido.</p>
+              </div>
+              <span class="status-badge" id="status-badge">Disponible</span>
+            </div>
+
+            <div class="status-stats">
+              <div class="mini-stat"><span>Persona</span><strong id="personas">0</strong><small>detecciones</small></div>
+              <div class="mini-stat"><span>Compuerta</span><strong id="servo-valor">Cerrada</strong><small id="servo-sub">bloqueo activo</small></div>
+              <div class="mini-stat"><span>Bandejas</span><strong id="bandejas-valor">3/3</strong><small id="bandejas-sub">carga correcta</small></div>
+              <div class="mini-stat"><span>Actualización</span><strong id="ultima">--:--</strong><small>telemetría</small></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel risk-card">
+          <div class="panel-header">
+            <div class="panel-title">Índice de riesgo</div>
+            <span class="pill ok" id="riesgo-pill">Nivel bajo</span>
+          </div>
+          <div class="panel-body">
+            <div class="gauge-wrap">
+              <svg class="gauge" viewBox="0 0 220 140" aria-hidden="true">
+                <path class="gauge-bg" d="M35 115a75 75 0 0 1 150 0" />
+                <path class="gauge-value" id="gauge-value" d="M35 115a75 75 0 0 1 150 0" />
+              </svg>
+              <div class="gauge-center">
+                <strong><span id="riesgo-valor">0</span>%</strong>
+                <span>riesgo calculado</span>
+              </div>
+            </div>
+            <div class="risk-summary">
+              <strong id="risk-title">Operación dentro de parámetros</strong>
+              <p id="risk-copy">Las variables de temperatura, distancia, movimiento y conectividad se mantienen en rangos normales.</p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="health-row" aria-label="Estado de servicios">
+        <div class="health-card" id="health-arduino"><span class="health-dot"></span><div class="health-copy"><span>Controlador</span><strong id="arduino">Arduino operativo</strong></div></div>
+        <div class="health-card" id="health-rpi"><span class="health-dot"></span><div class="health-copy"><span>Procesamiento</span><strong id="raspberry">Raspberry Pi activo</strong></div></div>
+        <div class="health-card" id="health-cloud"><span class="health-dot"></span><div class="health-copy"><span>Sincronización</span><strong id="cloud">Cloud sincronizada</strong></div></div>
+        <div class="health-card info"><span class="health-dot"></span><div class="health-copy"><span>Frecuencia</span><strong id="sync-valor">1.0 s</strong></div></div>
+      </section>
+
+      <section class="metrics-grid" id="sensores" aria-label="Métricas de sensores">
+        <article class="metric">
+          <div class="metric-head"><div class="metric-title">Temperatura</div><div class="metric-icon">T</div></div>
+          <div class="metric-value"><span id="temp-valor">--</span><small>°C</small></div>
+          <div class="metric-foot" id="temp-sub">Rango nominal</div>
+          <div class="metric-line"><i id="temp-line"></i></div>
+        </article>
+        <article class="metric">
+          <div class="metric-head"><div class="metric-title">Distancia</div><div class="metric-icon">D</div></div>
+          <div class="metric-value"><span id="dist-valor">--</span><small>cm</small></div>
+          <div class="metric-foot" id="dist-sub">Radio seguro</div>
+          <div class="metric-line"><i id="dist-line"></i></div>
+        </article>
+        <article class="metric">
+          <div class="metric-head"><div class="metric-title">Movimiento</div><div class="metric-icon">PIR</div></div>
+          <div class="metric-value"><span id="pir-valor">--</span></div>
+          <div class="metric-foot">Sensor perimetral HC-SR501</div>
+          <div class="metric-line"><i id="pir-line"></i></div>
+        </article>
+        <article class="metric">
+          <div class="metric-head"><div class="metric-title">Visión</div><div class="metric-icon">FPS</div></div>
+          <div class="metric-value"><span id="fps-valor">--</span><small>fps</small></div>
+          <div class="metric-foot" id="modelo">Modelo de detección activo</div>
+          <div class="metric-line"><i id="fps-line"></i></div>
+        </article>
+        <article class="metric">
+          <div class="metric-head"><div class="metric-title">Humedad</div><div class="metric-icon">H</div></div>
+          <div class="metric-value"><span id="hum-valor">--</span><small>%</small></div>
+          <div class="metric-foot">Lectura ambiental DHT11</div>
+          <div class="metric-line"><i id="hum-line"></i></div>
+        </article>
+        <article class="metric">
+          <div class="metric-head"><div class="metric-title">Iluminación</div><div class="metric-icon">LDR</div></div>
+          <div class="metric-value"><span id="luz-valor">--</span><small>/1023</small></div>
+          <div class="metric-foot" id="luz-sub">Iluminación de área</div>
+          <div class="metric-line"><i id="luz-line"></i></div>
+        </article>
+        <article class="metric">
+          <div class="metric-head"><div class="metric-title">Operario</div><div class="metric-icon">ID</div></div>
+          <div class="metric-value" style="font-size: 24px;"><span id="operario">—</span></div>
+          <div class="metric-foot">Identificación de presencia</div>
+          <div class="metric-line"><i id="operario-line"></i></div>
+        </article>
+        <article class="metric">
+          <div class="metric-head"><div class="metric-title">Modo actual</div><div class="metric-icon">SIM</div></div>
+          <div class="metric-value" style="font-size: 24px;"><span id="mode-label">Normal</span></div>
+          <div class="metric-foot">Escenario de demostración</div>
+          <div class="metric-line"><i id="mode-line"></i></div>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <div class="split-stack">
+          <article class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Tendencia operacional</div>
+              <span class="panel-caption">Temperatura e índice de riesgo</span>
+            </div>
+            <div class="panel-body">
+              <div class="chart-wrap"><canvas id="chart" width="920" height="340"></canvas></div>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Flujo de seguridad</div>
+              <span class="panel-caption">Secuencia del sistema</span>
+            </div>
+            <div class="panel-body">
+              <div class="process-flow">
+                <div class="flow-step"><span>1</span><strong>Sensórica</strong><small>Temperatura, distancia, PIR, luz y bandejas.</small></div>
+                <div class="flow-step"><span>2</span><strong>Control local</strong><small>Arduino procesa umbrales y actuadores.</small></div>
+                <div class="flow-step"><span>3</span><strong>Procesamiento</strong><small>Raspberry Pi valida presencia y señal.</small></div>
+                <div class="flow-step"><span>4</span><strong>Registro</strong><small>Eventos y datos se preparan para reporte.</small></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel" id="reportes">
+            <div class="panel-header">
+              <div class="panel-title">Lecturas actuales</div>
+              <span class="panel-caption">Resumen técnico</span>
+            </div>
+            <div class="panel-body">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Variable</th>
+                      <th>Lectura</th>
+                      <th>Rango esperado</th>
+                      <th>Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody id="sensor-table"></tbody>
+                </table>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <aside class="split-stack">
+          <article class="panel controls-panel">
+            <div class="panel-header">
+              <div class="panel-title">Escenarios de Operación</div>
+              <span class="panel-caption">Teclas 1–5</span>
+            </div>
+            <div class="panel-body">
+              <div class="controls">
+                <button class="mode-btn active" data-mode="normal" type="button">
+                  <span class="mode-top"><span class="mode-label">Normal</span><span class="mode-key">1</span></span>
+                  <p>Operación segura y estable.</p>
+                </button>
+                <button class="mode-btn warn" data-mode="persona" type="button">
+                  <span class="mode-top"><span class="mode-label">Persona cerca</span><span class="mode-key">2</span></span>
+                  <p>Presencia dentro del radio de seguridad.</p>
+                </button>
+                <button class="mode-btn warn" data-mode="temperatura" type="button">
+                  <span class="mode-top"><span class="mode-label">Temperatura alta</span><span class="mode-key">3</span></span>
+                  <p>Temperatura fuera del rango ideal.</p>
+                </button>
+                <button class="mode-btn danger" data-mode="emergencia" type="button">
+                  <span class="mode-top"><span class="mode-label">Emergencia</span><span class="mode-key">4</span></span>
+                  <p>Activación de protocolo de seguridad.</p>
+                </button>
+                <button class="mode-btn neutral" data-mode="desconexion" type="button" style="grid-column: 1 / -1;">
+                  <span class="mode-top"><span class="mode-label">Desconexión</span><span class="mode-key">5</span></span>
+                  <p>Pérdida de comunicación con controlador y procesamiento.</p>
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel" id="eventos">
+            <div class="panel-header">
+              <div class="panel-title">Registro de eventos</div>
+              <span class="panel-caption" id="event-count">0 eventos</span>
+            </div>
+            <div class="panel-body">
+              <div class="events" id="eventos-lista"></div>
+            </div>
+          </article>
+        </aside>
+      </section>
+
+      <footer>
+        Universidad Mariano Gálvez de Guatemala · Arquitectura de Computadoras 1 · Sistema Inteligente de Seguridad para Hornos Industriales
+      </footer>
+    </main>
+  </div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+  const rnd = (min, max) => min + Math.random() * (max - min);
+  const formatTime = (date = new Date()) => date.toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+  let mode = 'normal';
+  let tick = 0;
+  let lastState = '';
+  let history = [];
+  let events = [];
+  let currentReport = null;
+
+  const modeNames = {
+    normal: 'Normal',
+    persona: 'Persona cerca',
+    temperatura: 'Temperatura alta',
+    emergencia: 'Emergencia',
+    desconexion: 'Desconexión'
+  };
+
+  const keyboardModes = {
+    '1': 'normal',
+    '2': 'persona',
+    '3': 'temperatura',
+    '4': 'emergencia',
+    '5': 'desconexion'
+  };
+
+  function telemetry() {
+    tick += 1;
+    const base = {
+      timestamp: Date.now(),
+      temperatura: 28.2 + Math.sin(tick / 13) * 1.2 + rnd(-0.25, 0.25),
+      humedad: 62 + Math.sin(tick / 16) * 3.2 + rnd(-1.1, 1.1),
+      pir: 0,
+      distancia_cm: 72 + Math.sin(tick / 10) * 6 + rnd(-2, 2),
+      luz: 630 + Math.sin(tick / 14) * 58 + rnd(-14, 14),
+      bandejas: 3,
+      personas_detectadas: 0,
+      operarios_presentes: [],
+      fps: 24 + Math.sin(tick / 8) * 1.8 + rnd(-0.45, 0.45),
+      arduino_conectado: true,
+      raspberry_conectado: true,
+      cloud_conectada: true,
+      servo: 'Cerrada',
+      frecuencia_envio: 1.0
+    };
+
+    if (mode === 'persona') {
+      base.distancia_cm = rnd(11, 18);
+      base.pir = 1;
+      base.personas_detectadas = 1;
+      base.operarios_presentes = ['Operario A'];
+      base.fps = 22 + rnd(-0.9, 0.9);
+    }
+
+    if (mode === 'temperatura') {
+      base.temperatura = 43.5 + Math.sin(tick / 6) * 2.5 + rnd(-0.45, 0.45);
+    }
+
+    if (mode === 'emergencia') {
+      base.temperatura = 66 + Math.sin(tick / 4) * 3.4 + rnd(-0.8, 0.8);
+      base.distancia_cm = rnd(7, 13);
+      base.pir = 1;
+      base.personas_detectadas = 1;
+      base.operarios_presentes = ['No autorizado'];
+      base.bandejas = 1;
+      base.servo = 'Abierta';
+      base.fps = 17 + rnd(-1.6, 0.7);
+    }
+
+    if (mode === 'desconexion') {
+      base.arduino_conectado = false;
+      base.raspberry_conectado = false;
+      base.cloud_conectada = false;
+      base.fps = 0;
+    }
+
+    return base;
+  }
+
+  function calculateRisk(d) {
+    if (!d.arduino_conectado || !d.raspberry_conectado) return 76;
+    let score = 0;
+    score += clamp((d.temperatura - 32) * 3.5, 0, 42);
+    score += d.distancia_cm > 0 ? clamp((25 - d.distancia_cm) * 2.8, 0, 34) : 14;
+    score += d.pir ? 14 : 0;
+    score += clamp(d.personas_detectadas * 12, 0, 22);
+    score += d.bandejas < 2 ? 16 : d.bandejas < 3 ? 6 : 0;
+    score += d.fps > 0 && d.fps < 16 ? 8 : 0;
+    return Math.round(clamp(score, 0, 100));
+  }
+
+  function inferState(d, risk) {
+    if (mode === 'emergencia' || risk >= 85) return 'emergency';
+    if (!d.arduino_conectado || !d.raspberry_conectado) return 'failure';
+    if (d.personas_detectadas > 0 || d.pir || d.distancia_cm < 20) return 'restricted';
+    if (risk > 35 || d.temperatura >= 40) return 'attention';
+    return 'safe';
+  }
+
+  function stateCopy(state, d, risk) {
+    const copy = {
+      safe: {
+        title: 'OPERACIÓN SEGURA',
+        badge: 'Disponible',
+        desc: 'Condiciones nominales. No se detecta presencia en el área restringida y la temperatura se mantiene dentro del rango permitido.',
+        riskTitle: 'Operación dentro de parámetros',
+        riskCopy: 'Las variables de temperatura, distancia, movimiento y conectividad se mantienen en rangos normales.'
+      },
+      attention: {
+        title: 'VERIFICACIÓN REQUERIDA',
+        badge: 'Precaución',
+        desc: `Temperatura elevada o condición preventiva detectada. Riesgo calculado: ${risk}%. Validar antes de habilitar operación continua.`,
+        riskTitle: 'Condición preventiva activa',
+        riskCopy: 'Se recomienda revisar temperatura y esperar estabilización antes de continuar.'
+      },
+      restricted: {
+        title: 'ACCESO RESTRINGIDO',
+        badge: 'Interbloqueo',
+        desc: `${d.personas_detectadas || 1} presencia detectada en el perímetro. El sistema mantiene operación restringida por seguridad.`,
+        riskTitle: 'Presencia en zona de seguridad',
+        riskCopy: 'El sensor PIR y la distancia indican proximidad. Mantener bloqueo hasta despejar el área.'
+      },
+      failure: {
+        title: 'COMUNICACIÓN INTERRUMPIDA',
+        badge: 'Revisión técnica',
+        desc: 'Se perdió comunicación con el controlador, el procesamiento local o la sincronización. Revisar alimentación y conexión de red.',
+        riskTitle: 'Telemetría incompleta',
+        riskCopy: 'El sistema conserva el estado de seguridad y requiere validación física de conectividad.'
+      },
+      emergency: {
+        title: 'PROTOCOLO DE EMERGENCIA',
+        badge: 'Acción inmediata',
+        desc: 'Condición crítica detectada. Se activa apertura de seguridad, alarma local y registro prioritario del evento.',
+        riskTitle: 'Riesgo crítico',
+        riskCopy: 'Bloquear operación y solicitar revisión del supervisor antes de reiniciar el sistema.'
+      }
+    };
+    return copy[state] || copy.safe;
+  }
+
+  function updateUI(d) {
+    const risk = calculateRisk(d);
+    const state = inferState(d, risk);
+    const copy = stateCopy(state, d, risk);
+
+    $('operation-panel').className = `panel operational-card ${state}`;
+    $('estado-texto').textContent = copy.title;
+    $('estado-subtitulo').textContent = copy.desc;
+    $('status-badge').textContent = copy.badge;
+    $('status-badge').className = `status-badge ${state}`;
+
+    $('riesgo-valor').textContent = risk;
+    $('risk-title').textContent = copy.riskTitle;
+    $('risk-copy').textContent = copy.riskCopy;
+    updateGauge(risk, state);
+    updateRiskPill(risk, state);
+
+    $('temp-valor').textContent = d.temperatura.toFixed(1);
+    $('hum-valor').textContent = d.humedad.toFixed(0);
+    $('pir-valor').textContent = d.pir ? 'Activo' : 'Inactivo';
+    $('dist-valor').textContent = Math.round(d.distancia_cm);
+    $('luz-valor').textContent = Math.round(d.luz);
+    $('bandejas-valor').textContent = `${d.bandejas}/3`;
+    $('fps-valor').textContent = d.fps.toFixed(1);
+    $('servo-valor').textContent = d.servo;
+    $('sync-valor').textContent = `${d.frecuencia_envio.toFixed(1)} s`;
+    $('mode-label').textContent = modeNames[mode];
+
+    $('temp-sub').textContent = d.temperatura >= 60 ? 'Temperatura crítica' : d.temperatura >= 40 ? 'Temperatura elevada' : d.temperatura >= 35 ? 'Nivel preventivo' : 'Rango nominal';
+    $('dist-sub').textContent = d.distancia_cm < 20 ? 'Proximidad no segura' : 'Radio seguro';
+    $('luz-sub').textContent = `${Math.round((d.luz / 1023) * 100)}% de iluminación`;    
+    $('bandejas-sub').textContent = d.bandejas >= 3 ? 'carga correcta' : d.bandejas >= 2 ? 'carga parcial' : 'revisar carga';
+    $('servo-sub').textContent = d.servo === 'Abierta' ? 'acción de seguridad' : 'bloqueo activo';
+    $('personas').textContent = d.personas_detectadas;
+    $('operario').textContent = d.operarios_presentes.length ? d.operarios_presentes.join(', ') : '—';
+    $('arduino').textContent = d.arduino_conectado ? 'Arduino operativo' : 'Arduino sin señal';
+    $('raspberry').textContent = d.raspberry_conectado ? 'Raspberry Pi activo' : 'Raspberry Pi sin señal';
+    $('cloud').textContent = d.cloud_conectada ? 'Cloud sincronizada' : 'Cloud offline';
+    $('ultima').textContent = formatTime(new Date(d.timestamp));
+
+    setHealth('health-arduino', d.arduino_conectado ? 'ok' : 'dead');
+    setHealth('health-rpi', d.raspberry_conectado ? 'ok' : 'dead');
+    setHealth('health-cloud', d.cloud_conectada ? 'ok' : 'dead');
+
+    updateMetricLine('temp-line', clamp((d.temperatura / 80) * 100, 0, 100), d.temperatura >= 60 ? 'danger' : d.temperatura >= 40 ? 'warning' : 'success');
+    updateMetricLine('dist-line', clamp((d.distancia_cm / 80) * 100, 0, 100), d.distancia_cm < 20 ? 'danger' : 'success');
+    updateMetricLine('pir-line', d.pir ? 100 : 8, d.pir ? 'danger' : 'success');
+    updateMetricLine('fps-line', clamp((d.fps / 30) * 100, 0, 100), d.fps === 0 ? 'danger' : d.fps < 18 ? 'warning' : 'success');
+    updateMetricLine('hum-line', clamp(d.humedad, 0, 100), 'primary');
+    updateMetricLine('luz-line', clamp((d.luz / 1023) * 100, 0, 100), 'primary');
+    updateMetricLine('operario-line', d.personas_detectadas ? 100 : 0, d.personas_detectadas ? 'warning' : 'success');
+    updateMetricLine('mode-line', mode === 'normal' ? 25 : mode === 'persona' ? 45 : mode === 'temperatura' ? 60 : mode === 'emergencia' ? 100 : 76, state === 'safe' ? 'success' : state === 'attention' ? 'warning' : state === 'failure' ? 'neutral' : 'danger');
+
+    renderSensorTable(d, risk, state);
+
+    const stateLabel = copy.title;
+    if (stateLabel !== lastState) {
+      addEvent(eventTypeForState(state), `Cambio de estado: ${stateLabel}`, `Riesgo ${risk}%, temperatura ${d.temperatura.toFixed(1)} °C, distancia ${Math.round(d.distancia_cm)} cm.`);
+      lastState = stateLabel;
+    } else if (tick % 12 === 0 && state === 'safe') {
+      addEvent('ok', 'Lecturas estables', `Temperatura ${d.temperatura.toFixed(1)} °C, bandejas ${d.bandejas}/3, visión ${d.fps.toFixed(1)} fps.`);
+    }
+
+    history.push({ timestamp: d.timestamp, temp: d.temperatura, risk });
+    history = history.slice(-72);
+    currentReport = createReportSnapshot(d, risk, state, copy);
+    drawChart();
+  }
+
+  function setHealth(id, status) {
+    const el = $(id);
+    el.className = status === 'ok' ? 'health-card' : `health-card ${status}`;
+  }
+
+  function updateMetricLine(id, value, status) {
+    const el = $(id);
+    el.style.width = `${clamp(value, 0, 100)}%`;
+    const colors = {
+      success: 'var(--success)',
+      warning: 'var(--warning)',
+      danger: 'var(--danger)',
+      primary: 'var(--primary)',
+      neutral: 'var(--neutral)'
+    };
+    el.style.background = colors[status] || colors.primary;
+  }
+
+  function updateGauge(risk, state) {
+    const gauge = $('gauge-value');
+    const total = 282;
+    const offset = total - (risk / 100) * total;
+    gauge.style.strokeDashoffset = offset;
+    gauge.style.stroke = state === 'safe' ? 'var(--success)' : state === 'attention' ? 'var(--warning)' : state === 'failure' ? 'var(--neutral)' : 'var(--danger)';
+  }
+
+  function updateRiskPill(risk, state) {
+    const pill = $('riesgo-pill');
+    if (state === 'failure') {
+      pill.textContent = 'Revisión';
+      pill.className = 'pill neutral';
+    } else if (risk < 25) {
+      pill.textContent = 'Nivel bajo';
+      pill.className = 'pill ok';
+    } else if (risk < 55) {
+      pill.textContent = 'Nivel medio';
+      pill.className = 'pill warn';
+    } else if (risk < 80) {
+      pill.textContent = 'Nivel alto';
+      pill.className = 'pill danger';
+    } else {
+      pill.textContent = 'Crítico';
+      pill.className = 'pill danger';
+    }
+  }
+
+  function eventTypeForState(state) {
+    return state === 'safe' ? 'ok' : state === 'attention' ? 'warn' : state === 'failure' ? 'neutral' : 'danger';
+  }
+
+  function addEvent(type, title, desc = '') {
+    events.unshift({ type, title, desc, time: new Date() });
+    events = events.slice(0, 28);
+    renderEvents();
+  }
+
+  function renderEvents() {
+    const list = $('eventos-lista');
+    $('event-count').textContent = `${events.length} evento${events.length === 1 ? '' : 's'}`;
+    if (!events.length) {
+      list.innerHTML = '<div class="event"><div class="event-desc">No hay eventos registrados.</div></div>';
+      return;
+    }
+    const classMap = { ok: 'ok', warn: 'warn', danger: 'danger', neutral: 'neutral', info: 'info' };
+    const labelMap = { ok: 'OK', warn: 'PREVENTIVO', danger: 'CRÍTICO', neutral: 'SISTEMA', info: 'INFO' };
+    list.innerHTML = events.map(e => `
+      <div class="event">
+        <div class="event-head">
+          <span class="pill ${classMap[e.type] || 'info'}">${labelMap[e.type] || 'INFO'}</span>
+          <span class="event-time">${e.time.toLocaleString('es-GT')}</span>
+        </div>
+        <div class="event-title">${escapeHTML(e.title)}</div>
+        ${e.desc ? `<div class="event-desc">${escapeHTML(e.desc)}</div>` : ''}
+      </div>
+    `).join('');
+  }
+
+  function escapeHTML(value) {
+    return String(value).replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+  }
+
+  function renderSensorTable(d, risk, state) {
+    const rows = [
+      ['Temperatura', `${d.temperatura.toFixed(1)} °C`, '20–35 °C ', d.temperatura >= 60 ? ['Crítico', 'danger'] : d.temperatura >= 40 ? ['Elevado', 'warn'] : ['Normal', 'ok']],
+      ['Distancia ultrasónica', `${Math.round(d.distancia_cm)} cm`, '> 20 cm', d.distancia_cm < 20 ? ['No segura', 'danger'] : ['Segura', 'ok']],
+      ['Movimiento PIR', d.pir ? 'Activo' : 'Inactivo', 'Inactivo', d.pir ? ['Presencia', 'warn'] : ['Sin movimiento', 'ok']],
+      ['Bandejas', `${d.bandejas}/3`, '2–3 detectadas', d.bandejas < 2 ? ['Revisar', 'danger'] : d.bandejas < 3 ? ['Parcial', 'warn'] : ['Correcto', 'ok']],
+      ['Procesamiento de visión', `${d.fps.toFixed(1)} fps`, '> 18 fps', d.fps === 0 ? ['Sin señal', 'danger'] : d.fps < 18 ? ['Bajo', 'warn'] : ['Activo', 'ok']],
+      ['Conectividad', d.arduino_conectado && d.raspberry_conectado ? 'Operativa' : 'Interrumpida', 'Operativa', state === 'failure' ? ['Revisión', 'neutral'] : ['Operativa', 'ok']],
+      ['Índice de riesgo', `${risk}%`, '< 25%', risk < 25 ? ['Bajo', 'ok'] : risk < 55 ? ['Medio', 'warn'] : ['Alto', 'danger']]
+    ];
+    $('sensor-table').innerHTML = rows.map(([name, reading, expected, status]) => `
+      <tr>
+        <td><strong>${name}</strong></td>
+        <td>${reading}</td>
+        <td>${expected}</td>
+        <td><span class="pill ${status[1]}">${status[0]}</span></td>
+      </tr>
+    `).join('');
+  }
+
+  function drawChart() {
+    const canvas = $('chart');
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width;
+    const h = canvas.height;
+    const padL = 44;
+    const padR = 38;
+    const padT = 30;
+    const padB = 34;
+    ctx.clearRect(0, 0, w, h);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, w, h);
+
+    const plotW = w - padL - padR;
+    const plotH = h - padT - padB;
+
+    ctx.strokeStyle = '#dbe3ef';
+    ctx.lineWidth = 1;
+    ctx.fillStyle = '#64748b';
+    ctx.font = '12px Inter, system-ui, sans-serif';
+    for (let i = 0; i <= 4; i++) {
+      const y = padT + plotH * (i / 4);
+      ctx.beginPath();
+      ctx.moveTo(padL, y);
+      ctx.lineTo(w - padR, y);
+      ctx.stroke();
+      const label = Math.round(100 - i * 25);
+      ctx.fillText(label.toString(), 12, y + 4);
+    }
+
+    ctx.fillStyle = '#0f172a';
+    ctx.font = '700 12px Inter, system-ui, sans-serif';
+    ctx.fillText('Temperatura °C', padL, 16);
+    ctx.fillText('Riesgo %', w - 94, 16);
+
+    if (history.length < 2) return;
+
+    const xFor = (i) => padL + plotW * (i / (history.length - 1));
+    const yTemp = (v) => padT + plotH - clamp((v - 20) / 55, 0, 1) * plotH;
+    const yRisk = (v) => padT + plotH - clamp(v / 100, 0, 1) * plotH;
+
+    drawLine(ctx, history.map((p, i) => [xFor(i), yTemp(p.temp)]), '#155e9f', 3);
+    drawLine(ctx, history.map((p, i) => [xFor(i), yRisk(p.risk)]), '#b91c1c', 3);
+
+    const latest = history[history.length - 1];
+    drawPoint(ctx, xFor(history.length - 1), yTemp(latest.temp), '#155e9f');
+    drawPoint(ctx, xFor(history.length - 1), yRisk(latest.risk), '#b91c1c');
+
+    ctx.fillStyle = '#475569';
+    ctx.font = '12px Inter, system-ui, sans-serif';
+    ctx.fillText(`${latest.temp.toFixed(1)} °C`, w - 120, yTemp(latest.temp) - 10);
+    ctx.fillText(`${latest.risk}%`, w - 70, yRisk(latest.risk) - 10);
+  }
+
+  function drawLine(ctx, points, color, width) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    points.forEach(([x, y], index) => index ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+    ctx.stroke();
+  }
+
+  function drawPoint(ctx, x, y, color) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function setMode(nextMode) {
+    if (!modeNames[nextMode]) return;
+    mode = nextMode;
+    document.querySelectorAll('[data-mode]').forEach(btn => btn.classList.toggle('active', btn.dataset.mode === mode));
+    addEvent(mode === 'normal' ? 'ok' : mode === 'emergencia' ? 'danger' : mode === 'desconexion' ? 'neutral' : 'warn', `Escenario seleccionado: ${modeNames[mode]}`, 'Cambio ejecutado desde controles de demostración.');
+    updateUI(telemetry());
+  }
+
+  function setActiveNav(targetName) {
+    document.querySelectorAll('[data-nav]').forEach(item => {
+      item.classList.toggle('active', item.dataset.nav === targetName);
+    });
+  }
+
+  function goToSection(targetName) {
+    const section = document.getElementById(targetName);
+    if (!section) return;
+    setActiveNav(targetName);
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  document.querySelectorAll('[data-nav]').forEach(item => {
+    item.addEventListener('click', () => goToSection(item.dataset.nav));
+    item.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      goToSection(item.dataset.nav);
+    });
+  });
+
+  const sectionObserver = new IntersectionObserver((entries) => {
+    const visible = entries
+      .filter(entry => entry.isIntersecting)
+      .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+    if (visible) setActiveNav(visible.target.id);
+  }, { root: null, threshold: [0.35, 0.55, 0.75] });
+
+  ['operacion', 'sensores', 'eventos', 'reportes'].forEach(id => {
+    const section = document.getElementById(id);
+    if (section) sectionObserver.observe(section);
+  });
+
+
+  function createReportSnapshot(d, risk, state, copy) {
+    return {
+      generatedAt: new Date(),
+      mode,
+      modeName: modeNames[mode] || mode,
+      state,
+      copy: { ...copy },
+      risk,
+      telemetry: { ...d },
+      history: history.map(item => ({ ...item })),
+      events: events.map(item => ({
+        type: item.type,
+        title: item.title,
+        desc: item.desc,
+        time: new Date(item.time)
+      }))
+    };
+  }
+
+  function generateStructuredReport() {
+    const snapshot = currentReport;
+    if (!snapshot) return;
+
+    const html = buildReportHTML(snapshot);
+    const reportWindow = window.open('', '_blank');
+    if (reportWindow) {
+      reportWindow.document.open();
+      reportWindow.document.write(html);
+      reportWindow.document.close();
+      reportWindow.focus();
+      addEvent('info', 'Reporte generado', 'Se abrió un informe estructurado con las lecturas actuales y el registro reciente.');
+      return;
+    }
+
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `reporte_horno_industrial_${fileTimestamp(new Date())}.html`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    addEvent('info', 'Reporte descargado', 'El navegador bloqueó la ventana emergente, por eso se descargó el archivo HTML.');
+  }
+
+  function buildReportHTML(report) {
+    const d = report.telemetry;
+    const generated = report.generatedAt;
+    const stateClass = report.state === 'safe' ? 'ok' : report.state === 'attention' || report.state === 'restricted' ? 'warn' : report.state === 'failure' ? 'neutral' : 'danger';
+    const trend = getTrendSummary(report.history);
+    const recommendations = recommendationForReport(report.state, report.risk);
+    const eventRows = report.events.slice(0, 8).map((event, index) => {
+      const detail = event.desc ? escapeHTML(event.desc).slice(0, 95) : '';
+      return `
+        <tr>
+          <td>${index + 1}</td>
+          <td><span class="badge ${event.type === 'danger' ? 'danger' : event.type === 'warn' ? 'warn' : event.type === 'neutral' ? 'neutral' : 'ok'}">${escapeHTML(reportEventLabel(event.type))}</span></td>
+          <td>${escapeHTML(new Date(event.time).toLocaleString('es-GT'))}</td>
+          <td><strong>${escapeHTML(event.title)}</strong>${detail ? `<br><span class="muted">${detail}</span>` : ''}</td>
+        </tr>
+      `;
+    }).join('') || '<tr><td colspan="4" class="muted">Sin eventos registrados.</td></tr>';
+
+    const sensorRows = [
+      ['Temperatura', `${d.temperatura.toFixed(1)} °C`, '20–35 °C', reportSensorStatus(d.temperatura < 35, d.temperatura >= 40, 'Normal', 'Elevada')],
+      ['Humedad ambiental', `${d.humedad.toFixed(0)}%`, 'Referencia ambiental', ['Informativo', 'neutral']],
+      ['Distancia ultrasónica', `${Math.round(d.distancia_cm)} cm`, '> 20 cm', d.distancia_cm < 20 ? ['No segura', 'danger'] : ['Segura', 'ok']],
+      ['Movimiento PIR', d.pir ? 'Activo' : 'Inactivo', 'Inactivo', d.pir ? ['Presencia detectada', 'warn'] : ['Sin movimiento', 'ok']],
+      ['Bandejas detectadas', `${d.bandejas}/3`, '2–3 bandejas', d.bandejas < 2 ? ['Revisión', 'danger'] : d.bandejas < 3 ? ['Parcial', 'warn'] : ['Correcto', 'ok']],
+      ['Procesamiento Raspberry Pi', `${d.fps.toFixed(1)} fps`, '> 18 fps', d.fps === 0 ? ['Sin señal', 'danger'] : d.fps < 18 ? ['Bajo', 'warn'] : ['Activo', 'ok']],
+      ['Compuerta de seguridad', d.servo, 'Cerrada en operación normal', d.servo === 'Cerrada' ? ['Bloqueo activo', 'ok'] : ['Acción de seguridad', 'warn']],
+      ['Índice de riesgo', `${report.risk}%`, '< 25%', report.risk < 25 ? ['Bajo', 'ok'] : report.risk < 55 ? ['Medio', 'warn'] : report.risk < 80 ? ['Alto', 'danger'] : ['Crítico', 'danger']]
+    ].map(([name, value, expected, status]) => `
+      <tr>
+        <td>${escapeHTML(name)}</td>
+        <td><strong>${escapeHTML(value)}</strong></td>
+        <td>${escapeHTML(expected)}</td>
+        <td><span class="badge ${status[1]}">${escapeHTML(status[0])}</span></td>
+      </tr>
+    `).join('');
+
+    const connectivityRows = [
+      ['Controlador Arduino', d.arduino_conectado ? 'Operativo' : 'Sin señal', d.arduino_conectado ? 'ok' : 'danger'],
+      ['Raspberry Pi', d.raspberry_conectado ? 'Activo' : 'Sin señal', d.raspberry_conectado ? 'ok' : 'danger'],
+      ['Sincronización Cloud', d.cloud_conectada ? 'Sincronizada' : 'Offline', d.cloud_conectada ? 'ok' : 'danger'],
+      ['Frecuencia de telemetría', `${d.frecuencia_envio.toFixed(1)} s`, 'neutral']
+    ].map(([name, value, cls]) => `
+      <tr>
+        <td>${escapeHTML(name)}</td>
+        <td><span class="badge ${cls}">${escapeHTML(value)}</span></td>
+      </tr>
+    `).join('');
+
+    return `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reporte Operacional - Horno Industrial 01</title>
+  <style>
+    :root {
+      --ink: #0f172a;
+      --text: #263241;
+      --muted: #64748b;
+      --line: #d8e0eb;
+      --soft: #f7f9fc;
+      --primary: #0f4c81;
+      --ok: #047857;
+      --warn: #b45309;
+      --danger: #b91c1c;
+      --neutral: #475569;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: #e5e7eb;
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.28;
+      font-size: 11px;
+    }
+    .sheet {
+      width: 8.5in;
+      margin: 18px auto;
+      background: #fff;
+      box-shadow: 0 18px 42px rgba(15, 23, 42, .16);
+    }
+    .page {
+      width: 8.5in;
+      min-height: 11in;
+      padding: .38in .44in .35in;
+      background: #fff;
+      position: relative;
+      page-break-after: always;
+      break-after: page;
+      overflow: hidden;
+    }
+    .page:last-child { page-break-after: auto; break-after: auto; }
+    .topline { height: 7px; background: linear-gradient(90deg, var(--primary), #111827); margin: -.38in -.44in .22in; }
+    .header {
+      display: grid;
+      grid-template-columns: 1fr 1.85in;
+      gap: .24in;
+      align-items: start;
+      padding-bottom: .14in;
+      border-bottom: 2px solid var(--line);
+    }
+    .eyebrow { color: var(--primary); text-transform: uppercase; font-size: 9px; font-weight: 900; letter-spacing: .13em; }
+    h1 { margin: 5px 0 4px; font-size: 22px; line-height: 1.02; letter-spacing: -.03em; color: var(--ink); }
+    .subtitle { margin: 0; color: var(--muted); max-width: 64ch; }
+    .doc-meta { text-align: right; font-size: 10px; color: var(--muted); line-height: 1.35; }
+    .doc-meta strong { display: block; color: var(--ink); font-size: 12px; margin-bottom: 3px; }
+    .section { margin-top: .16in; break-inside: avoid; page-break-inside: avoid; }
+    .section-title { font-size: 9.5px; text-transform: uppercase; letter-spacing: .13em; font-weight: 900; margin: 0 0 8px; color: #1f2937; }
+    .summary { display: grid; grid-template-columns: 1.18fr .82fr; gap: .14in; }
+    .box { border: 1px solid var(--line); border-radius: 12px; padding: .13in; background: #fff; break-inside: avoid; }
+    .status-title { font-size: 20px; font-weight: 900; margin: 0 0 5px; color: var(--ink); line-height: 1; }
+    .status-copy { color: #334155; margin: 0; }
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+    .kpi { border: 1px solid var(--line); border-radius: 9px; padding: 8px; background: var(--soft); min-height: .58in; }
+    .kpi span { display: block; color: var(--muted); font-size: 8.5px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; }
+    .kpi strong { display: block; margin-top: 4px; font-size: 16px; color: var(--ink); }
+    .risk-number { font-size: 42px; font-weight: 900; line-height: .9; letter-spacing: -.06em; color: var(--ink); }
+    .risk-number small { font-size: 19px; }
+    .risk-bar { height: 9px; border-radius: 999px; background: #e2e8f0; overflow: hidden; margin: 10px 0 8px; }
+    .risk-bar > div { height: 100%; width: ${report.risk}%; background: ${stateClass === 'ok' ? 'var(--ok)' : stateClass === 'warn' ? 'var(--warn)' : stateClass === 'neutral' ? 'var(--neutral)' : 'var(--danger)'}; }
+    .badge { display: inline-flex; align-items: center; border-radius: 999px; padding: 3px 7px; font-size: 9.5px; font-weight: 900; border: 1px solid transparent; white-space: nowrap; }
+    .badge.ok { color: #065f46; background: #ecfdf5; border-color: #a7f3d0; }
+    .badge.warn { color: #92400e; background: #fffbeb; border-color: #fde68a; }
+    .badge.danger { color: #991b1b; background: #fef2f2; border-color: #fecaca; }
+    .badge.neutral { color: #334155; background: #f1f5f9; border-color: #cbd5e1; }
+    table { width: 100%; border-collapse: collapse; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+    th, td { padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; text-align: left; font-size: 10.4px; }
+    th { background: #f8fafc; font-size: 8.5px; text-transform: uppercase; letter-spacing: .08em; color: #334155; }
+    tr:last-child td { border-bottom: 0; }
+    tr { break-inside: avoid; page-break-inside: avoid; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: .14in; }
+    .note { border-left: 4px solid var(--primary); background: #f8fafc; padding: 10px 12px; border-radius: 9px; color: #334155; }
+    .muted { color: var(--muted); }
+    .footer {
+      position: absolute;
+      left: .44in;
+      right: .44in;
+      bottom: .20in;
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid var(--line);
+      padding-top: 7px;
+      color: var(--muted);
+      font-size: 9.5px;
+    }
+    .signatures { display: grid; grid-template-columns: 1fr 1fr; gap: .36in; margin-top: .70in; break-inside: avoid; page-break-inside: avoid; }
+    .signature { border-top: 1px solid #94a3b8; padding-top: 11px; min-height: .50in; color: var(--muted); font-size: 10px; }
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 14px 18px;
+      border-top: 1px solid var(--line);
+      background: #f8fafc;
+      position: sticky;
+      bottom: 0;
+    }
+    button { border: 1px solid #cbd5e1; background: #fff; color: var(--ink); border-radius: 10px; padding: 10px 14px; font-weight: 800; cursor: pointer; }
+    button.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+    @page { size: Letter portrait; margin: 10mm; }
+    @media print {
+      html, body { background: #fff; width: auto; height: auto; }
+      .sheet { width: auto; margin: 0; box-shadow: none; border: 0; }
+      .page {
+        width: auto;
+        min-height: calc(279.4mm - 20mm);
+        height: calc(279.4mm - 20mm);
+        padding: 0;
+        overflow: hidden;
+      }
+      .topline { margin: 0 0 5mm; }
+      .actions { display: none !important; }
+      .footer { left: 0; right: 0; bottom: 0; }
+      .section, .box, table, tr { break-inside: avoid; page-break-inside: avoid; }
+      body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    }
+    @media screen and (max-width: 900px) {
+      .sheet, .page { width: 100%; }
+      .page { min-height: auto; }
+      .header, .summary, .grid-2, .signatures { grid-template-columns: 1fr; }
+      .doc-meta { text-align: left; }
+      .kpis { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <section class="page">
+      <div class="topline"></div>
+      <header class="header">
+        <div>
+          <div class="eyebrow">Reporte operacional</div>
+          <h1>Seguridad de Horno Industrial</h1>
+          <p class="subtitle">Informe generado con las lecturas actuales del panel de monitoreo. Los datos se organizan como indicadores, tablas y observaciones técnicas.</p>
+        </div>
+        <div class="doc-meta">
+          <strong>Horno Industrial 01</strong>
+          Generado: ${escapeHTML(generated.toLocaleString('es-GT'))}<br>
+          Escenario: ${escapeHTML(report.modeName)}<br>
+          Formato: Carta / máximo 2 páginas
+        </div>
+      </header>
+
+      <section class="section summary">
+        <div class="box">
+          <p class="section-title">Resumen ejecutivo</p>
+          <div class="status-title">${escapeHTML(report.copy.title)}</div>
+          <p class="status-copy">${escapeHTML(report.copy.desc)}</p>
+          <div class="kpis">
+            <div class="kpi"><span>Persona</span><strong>${d.personas_detectadas}</strong></div>
+            <div class="kpi"><span>Compuerta</span><strong>${escapeHTML(d.servo)}</strong></div>
+            <div class="kpi"><span>Bandejas</span><strong>${d.bandejas}/3</strong></div>
+            <div class="kpi"><span>Lectura</span><strong style="font-size:13px">${escapeHTML(new Date(d.timestamp).toLocaleTimeString('es-GT'))}</strong></div>
+          </div>
+        </div>
+        <div class="box">
+          <p class="section-title">Índice de riesgo</p>
+          <div class="risk-number">${report.risk}<small>%</small></div>
+          <div class="risk-bar"><div></div></div>
+          <span class="badge ${stateClass}">${escapeHTML(report.copy.badge)}</span>
+          <p class="muted" style="margin:8px 0 0">${escapeHTML(report.copy.riskCopy)}</p>
+        </div>
+      </section>
+
+      <section class="section">
+        <p class="section-title">Lecturas técnicas actuales</p>
+        <table>
+          <thead><tr><th>Variable</th><th>Lectura</th><th>Rango esperado</th><th>Estado</th></tr></thead>
+          <tbody>${sensorRows}</tbody>
+        </table>
+      </section>
+
+      <section class="section grid-2">
+        <div>
+          <p class="section-title">Conectividad</p>
+          <table>
+            <thead><tr><th>Componente</th><th>Estado</th></tr></thead>
+            <tbody>${connectivityRows}</tbody>
+          </table>
+        </div>
+        <div>
+          <p class="section-title">Tendencia reciente</p>
+          <table>
+            <thead><tr><th>Indicador</th><th>Prom.</th><th>Mín.</th><th>Máx.</th></tr></thead>
+            <tbody>
+              <tr><td>Temperatura</td><td>${trend.tempAvg} °C</td><td>${trend.tempMin} °C</td><td>${trend.tempMax} °C</td></tr>
+              <tr><td>Riesgo</td><td>${trend.riskAvg}%</td><td>${trend.riskMin}%</td><td>${trend.riskMax}%</td></tr>
+            </tbody>
+          </table>
+          <p class="muted" style="margin:7px 0 0">Muestra: últimas ${trend.count} lecturas retenidas en el tablero.</p>
+        </div>
+      </section>
+      <div class="footer"><span>Panel Ejecutivo | Seguridad de Horno Industrial</span><span>Página 1 de 2</span></div>
+    </section>
+
+    <section class="page">
+      <div class="topline"></div>
+      <header class="header">
+        <div>
+          <div class="eyebrow">Continuación del reporte</div>
+          <h1>Eventos y acciones recomendadas</h1>
+          <p class="subtitle">Registro operativo resumido para revisión del supervisor y documentación interna.</p>
+        </div>
+        <div class="doc-meta">
+          <strong>Horno Industrial 01</strong>
+          Generado: ${escapeHTML(generated.toLocaleString('es-GT'))}<br>
+          Estado: ${escapeHTML(report.copy.title)}<br>
+          Riesgo: ${report.risk}%
+        </div>
+      </header>
+
+      <section class="section">
+        <p class="section-title">Registro reciente de eventos</p>
+        <table>
+          <thead><tr><th style="width:28px">#</th><th style="width:86px">Tipo</th><th style="width:130px">Fecha/hora</th><th>Descripción</th></tr></thead>
+          <tbody>${eventRows}</tbody>
+        </table>
+      </section>
+
+      <section class="section">
+        <p class="section-title">Observaciones técnicas</p>
+        <div class="note">${escapeHTML(recommendations)}</div>
+      </section>
+
+      <section class="section grid-2">
+        <div class="box">
+          <p class="section-title">Criterio de cierre</p>
+          <p style="margin:0">El informe queda válido para la condición observada en el momento de generación. Cualquier cambio de temperatura, presencia, conectividad o compuerta requiere una nueva emisión del reporte.</p>
+        </div>
+        <div class="box">
+          <p class="section-title">Responsabilidad</p>
+          <p style="margin:0">El reporte debe ser revisado por el responsable de monitoreo y, en condición de alerta o emergencia, por el supervisor de seguridad industrial.</p>
+        </div>
+      </section>
+
+      <section class="signatures">
+        <div class="signature">Responsable de monitoreo</div>
+        <div class="signature">Supervisor / Jefe de seguridad</div>
+      </section>
+      <div class="footer"><span>Panel Ejecutivo | Seguridad de Horno Industrial</span><span>Página 2 de 2</span></div>
+    </section>
+
+    <div class="actions">
+      <button onclick="window.print()" class="primary">Guardar como PDF / Imprimir</button>
+      <button onclick="window.close()">Cerrar</button>
+    </div>
+  </div>
+</body>
+</html>`;
+  }
+
+  function reportSensorStatus(isOk, isDanger, okLabel, badLabel) {
+    if (isOk) return [okLabel, 'ok'];
+    return [badLabel, isDanger ? 'danger' : 'warn'];
+  }
+
+  function reportEventLabel(type) {
+    return ({ ok: 'OK', warn: 'PREVENTIVO', danger: 'CRÍTICO', neutral: 'SISTEMA', info: 'INFO' })[type] || 'INFO';
+  }
+
+  function recommendationForReport(state, risk) {
+    if (state === 'safe') return 'El sistema se encuentra dentro de parámetros normales. Mantener el monitoreo activo y continuar con la operación estándar del horno.';
+    if (state === 'attention') return 'Se recomienda validar temperatura, esperar estabilización del área de proceso y confirmar que la operación continua sea segura antes de habilitar el siguiente ciclo.';
+    if (state === 'restricted') return 'Mantener el interbloqueo activo hasta despejar el perímetro del horno. Confirmar visualmente que no exista presencia u objeto dentro del radio de seguridad.';
+    if (state === 'failure') return 'Revisar alimentación, cableado, conexión USB/serial, estado de Raspberry Pi y sincronización de red antes de considerar el sistema operativo.';
+    if (state === 'emergency') return 'No reiniciar el sistema hasta realizar inspección física del horno, validar sensores, registrar el incidente y obtener autorización del supervisor responsable.';
+    return `Revisar condiciones de operación. Índice de riesgo actual: ${risk}%.`;
+  }
+
+  function getTrendSummary(items) {
+    const safeItems = items && items.length ? items : [];
+    const temps = safeItems.map(item => Number(item.temp)).filter(Number.isFinite);
+    const risks = safeItems.map(item => Number(item.risk)).filter(Number.isFinite);
+    const summarize = (values, fallback = 0) => {
+      if (!values.length) return { avg: fallback.toFixed(1), min: fallback.toFixed(1), max: fallback.toFixed(1) };
+      const avg = values.reduce((acc, value) => acc + value, 0) / values.length;
+      return { avg: avg.toFixed(1), min: Math.min(...values).toFixed(1), max: Math.max(...values).toFixed(1) };
+    };
+    const temp = summarize(temps, 0);
+    const risk = summarize(risks, 0);
+    return {
+      count: safeItems.length,
+      tempAvg: temp.avg,
+      tempMin: temp.min,
+      tempMax: temp.max,
+      riskAvg: Number(risk.avg).toFixed(0),
+      riskMin: Number(risk.min).toFixed(0),
+      riskMax: Number(risk.max).toFixed(0)
+    };
+  }
+
+  function fileTimestamp(date) {
+    const pad = value => String(value).padStart(2, '0');
+    return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}_${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`;
+  }
+
+  document.querySelectorAll('[data-mode]').forEach(btn => {
+    btn.addEventListener('click', () => setMode(btn.dataset.mode));
+  });
+
+  document.addEventListener('keydown', (event) => {
+    const target = event.target;
+    const isTyping = target && target.matches && target.matches('input, textarea, select, [contenteditable="true"]');
+    if (isTyping || event.ctrlKey || event.metaKey || event.altKey) return;
+    const nextMode = keyboardModes[event.key];
+    if (!nextMode) return;
+    event.preventDefault();
+    setMode(nextMode);
+  });
+
+  $('btn-reset').addEventListener('click', () => {
+    events = [];
+    lastState = '';
+    addEvent('ok', 'Registro reiniciado', 'El panel quedó listo para una nueva demostración.');
+  });
+
+  $('btn-print').addEventListener('click', generateStructuredReport);
+  window.addEventListener('resize', drawChart);
+
+  function updateClock() {
+    $('clock').textContent = formatTime();
+  }
+
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  addEvent('ok', 'Panel iniciado', 'Telemetría simulada para presentación del sistema de seguridad.');
+  updateUI(telemetry());
+
+  setInterval(() => updateUI(telemetry()), 1000);
+})();
+</script>
+</body>
+</html>

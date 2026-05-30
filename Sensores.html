@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1e40af" />
+  <title>Horno IA — Dashboard Inteligente </title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --card: #1e293b;
+      --card-soft: #172033;
+      --line: #334155;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --muted-2: #64748b;
+      --green: #22c55e;
+      --green-soft: #064e3b;
+      --blue: #3b82f6;
+      --blue-soft: #1e3a8a;
+      --yellow: #eab308;
+      --yellow-soft: #713f12;
+      --orange: #f97316;
+      --red: #ef4444;
+      --red-soft: #7f1d1d;
+      --violet: #8b5cf6;
+      --cyan: #06b6d4;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(59, 130, 246, .18), transparent 34rem),
+        radial-gradient(circle at top right, rgba(239, 68, 68, .10), transparent 32rem),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .layout {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(148, 163, 184, .20);
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      font-size: clamp(22px, 4vw, 34px);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    .chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #1e293b;
+      color: var(--muted);
+      border: 1px solid rgba(148, 163, 184, .16);
+      white-space: nowrap;
+    }
+
+    .chip.live { background: var(--green-soft); color: #bbf7d0; border-color: rgba(34,197,94,.35); }
+    .chip.demo { background: var(--blue-soft); color: #bfdbfe; border-color: rgba(59,130,246,.35); }
+    .chip.warn { background: var(--yellow-soft); color: #fde68a; border-color: rgba(234,179,8,.35); }
+    .chip.dead { background: var(--red-soft); color: #fecaca; border-color: rgba(239,68,68,.35); }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 12px;
+      color: #e5e7eb;
+      background: #243044;
+      cursor: pointer;
+      font-weight: 650;
+      font-size: 13px;
+      box-shadow: inset 0 0 0 1px rgba(148, 163, 184, .14);
+      transition: transform .16s, background .16s, box-shadow .16s;
+    }
+
+    button:hover { transform: translateY(-1px); background: #2c3a53; }
+    button.active { background: #1d4ed8; box-shadow: 0 0 0 3px rgba(59, 130, 246, .20); }
+    button.danger.active, button.danger:hover { background: #b91c1c; }
+    button.good.active, button.good:hover { background: #047857; }
+    button.warn.active, button.warn:hover { background: #a16207; }
+
+    .banner {
+      border-radius: 22px;
+      padding: clamp(20px, 4vw, 34px);
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-bottom: 14px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .banner::after {
+      content: "";
+      position: absolute;
+      inset: auto -10% -50% auto;
+      width: 28rem;
+      height: 28rem;
+      border-radius: 50%;
+      background: rgba(255,255,255,.08);
+      pointer-events: none;
+    }
+
+    .banner h2 {
+      font-size: clamp(28px, 7vw, 56px);
+      line-height: .95;
+      letter-spacing: -0.05em;
+      margin-bottom: 8px;
+    }
+
+    .banner p { color: rgba(255,255,255,.82); font-size: 15px; max-width: 62ch; }
+    .banner.SEGURO { background: linear-gradient(135deg, #14532d, #0f766e); color: #ecfdf5; }
+    .banner.VACIO_RECIENTE { background: linear-gradient(135deg, #164e63, #1e40af); color: #e0f2fe; }
+    .banner.OCUPADO { background: linear-gradient(135deg, #7f1d1d, #9a3412); color: #fee2e2; }
+    .banner.FALLA { background: linear-gradient(135deg, #713f12, #92400e); color: #fef3c7; }
+    .banner.EMERGENCIA { background: linear-gradient(135deg, #7f1d1d, #dc2626); color: #fee2e2; animation: pulse 1s infinite; }
+    .banner.INICIAL { background: linear-gradient(135deg, #334155, #1e293b); color: #e2e8f0; }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,.55); }
+      50% { box-shadow: 0 0 0 18px rgba(239,68,68,0); }
+    }
+
+    .ai-summary {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .ai-pill {
+      background: rgba(15, 23, 42, .35);
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 16px;
+      padding: 14px;
+      backdrop-filter: blur(10px);
+    }
+
+    .ai-pill .small { color: rgba(255,255,255,.72); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+    .ai-pill .big { font-size: 24px; font-weight: 800; margin-top: 4px; }
+    .ai-pill .note { color: rgba(255,255,255,.72); font-size: 12px; margin-top: 3px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .card, .panel {
+      background: rgba(30, 41, 59, .92);
+      border: 1px solid rgba(148, 163, 184, .13);
+      border-radius: 18px;
+      box-shadow: 0 16px 40px rgba(2, 6, 23, .18);
+    }
+
+    .card {
+      padding: 16px;
+      border-left: 4px solid var(--line);
+      min-height: 112px;
+    }
+
+    .card.temp { border-left-color: var(--orange); }
+    .card.hum { border-left-color: var(--cyan); }
+    .card.pir { border-left-color: var(--violet); }
+    .card.dist { border-left-color: var(--cyan); }
+    .card.luz { border-left-color: var(--yellow); }
+    .card.trays { border-left-color: var(--green); }
+    .card.fps { border-left-color: var(--blue); }
+    .card.risk { border-left-color: var(--red); }
+    .card.servo { border-left-color: #f43f5e; }
+    .card.cloud { border-left-color: #14b8a6; }
+
+    .card-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--muted);
+      letter-spacing: 0.07em;
+      margin-bottom: 8px;
+    }
+
+    .card-value {
+      font-size: clamp(26px, 5vw, 34px);
+      font-weight: 850;
+      color: #f8fafc;
+      line-height: 1;
+    }
+
+    .card-unit { font-size: 13px; color: var(--muted); margin-left: 4px; }
+    .card-sub { font-size: 12px; color: var(--muted-2); margin-top: 8px; line-height: 1.35; }
+
+    .main {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .panel { padding: 16px; }
+    .panel h3 {
+      font-size: 13px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+      letter-spacing: .07em;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(15, 23, 42, .8);
+      font-size: 14px;
+    }
+
+    .info-row:last-child { border-bottom: 0; }
+    .info-row span:first-child { color: var(--muted); }
+    .info-row span:last-child { color: #f8fafc; font-weight: 700; text-align: right; }
+
+    .chart-wrap {
+      height: 255px;
+      background: var(--card-soft);
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, .12);
+      padding: 10px;
+    }
+
+    canvas { width: 100%; height: 100%; display: block; }
+
+    .events {
+      max-height: 372px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .event-item {
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(15, 23, 42, .74);
+      border: 1px solid rgba(148, 163, 184, .10);
+      margin-bottom: 8px;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .event-time { color: var(--muted-2); font-size: 11px; margin-bottom: 6px; }
+    .event-tipo {
+      display: inline-block;
+      padding: 3px 7px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .03em;
+      margin-right: 6px;
+      background: #1e40af;
+      color: #dbeafe;
+    }
+    .event-tipo.OK { background: #065f46; color: #d1fae5; }
+    .event-tipo.IA { background: #4c1d95; color: #ede9fe; }
+    .event-tipo.ALERTA { background: #92400e; color: #ffedd5; }
+    .event-tipo.EMERGENCIA { background: #991b1b; color: #fee2e2; }
+
+    .progress {
+      height: 10px;
+      background: #0f172a;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 10px;
+      border: 1px solid rgba(148, 163, 184, .12);
+    }
+
+    .bar {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #22c55e, #eab308, #ef4444);
+      transition: width .3s ease;
+    }
+
+    .serial-box {
+      display: grid;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    code {
+      color: #c4b5fd;
+      background: rgba(15, 23, 42, .75);
+      padding: 2px 5px;
+      border-radius: 6px;
+    }
+
+    footer {
+      text-align: center;
+      color: #64748b;
+      font-size: 12px;
+      margin: 24px 0 8px;
+      line-height: 1.5;
+    }
+
+    @media (min-width: 760px) {
+      header { grid-template-columns: 1fr; }
+      .banner { grid-template-columns: minmax(0, 1.4fr) minmax(260px, .6fr); align-items: center; }
+      .ai-summary { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+      .main { grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr); }
+    }
+
+    @media (max-width: 520px) {
+      body { padding: 12px; }
+      .grid { grid-template-columns: 1fr; }
+      button { flex: 1; }
+      .buttons { width: 100%; }
+      .toolbar { justify-content: stretch; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <header>
+      <div class="title-row">
+        <div>
+          <h1>🔥 Horno Industrial IA</h1>
+          <div class="subtitle">Dashboard inteligente en modo lectura</div>
+        </div>
+        <div class="chips">
+          <span id="source-chip" class="chip demo">Modo lectura activo</span>
+          <span id="arduino-chip" class="chip live">Arduino OK</span>
+          <span id="rpi-chip" class="chip live">Raspberry Pi OK</span>
+          <span id="cloud-chip" class="chip live">Cloud sincronizada</span>
+        </div>
+      </div>
+      <div class="toolbar">
+        <div class="buttons">
+          <button id="btn-normal" class="good active" data-mode="normal">Normal</button>
+          <button id="btn-cerca" class="warn" data-mode="persona">Persona cerca</button>
+          <button id="btn-temp" class="warn" data-mode="temperatura">Temp. alta</button>
+          <button id="btn-emergencia" class="danger" data-mode="emergencia">Emergencia</button>
+          <button id="btn-desconexion" data-mode="desconexion">Desconexión</button>
+        </div>
+        <div class="buttons">
+          <button id="btn-serial">Conectar Arduino USB</button>
+          <button id="btn-reset">Reiniciar eventos</button>
+        </div>
+      </div>
+    </header>
+
+    <section id="banner" class="banner SEGURO">
+      <div>
+        <h2 id="estado-texto">🔵 HORNO HABILITADO</h2>
+        <p id="estado-subtitulo">Condición normal: sin presencia en zona de riesgo, temperatura estable y comunicación activa.</p>
+      </div>
+      <div class="ai-summary">
+        <div class="ai-pill">
+          <div class="small">Diagnóstico IA</div>
+          <div class="big" id="diagnostico">Operación segura</div>
+          <div class="note" id="diagnostico-nota">Probabilidad de riesgo baja durante los próximos minutos.</div>
+          <div class="progress"><div class="bar" id="risk-bar"></div></div>
+        </div>
+        <div class="ai-pill">
+          <div class="small">Predicción</div>
+          <div class="big" id="prediccion">5 min estables</div>
+          <div class="note" id="prediccion-nota">Modelo heurístico basado en temperatura, distancia, PIR, bandejas y FPS.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card temp">
+        <div class="card-label">Temperatura</div>
+        <div><span class="card-value" id="temp-valor">--</span><span class="card-unit">°C</span></div>
+        <div class="card-sub" id="temp-sub">Normal</div>
+      </div>
+      <div class="card hum">
+        <div class="card-label">Humedad</div>
+        <div><span class="card-value" id="hum-valor">--</span><span class="card-unit">%</span></div>
+        <div class="card-sub">Sensor DHT11 / ambiente</div>
+      </div>
+      <div class="card pir">
+        <div class="card-label">Movimiento</div>
+        <div class="card-value" id="pir-valor">—</div>
+        <div class="card-sub">Sensor PIR HC-SR501</div>
+      </div>
+      <div class="card dist">
+        <div class="card-label">Distancia</div>
+        <div><span class="card-value" id="dist-valor">--</span><span class="card-unit">cm</span></div>
+        <div class="card-sub" id="dist-sub">Radio seguro</div>
+      </div>
+      <div class="card luz">
+        <div class="card-label">Luz ambiente</div>
+        <div><span class="card-value" id="luz-valor">--</span><span class="card-unit">/1023</span></div>
+        <div class="card-sub" id="luz-sub">LDR</div>
+      </div>
+      <div class="card trays">
+        <div class="card-label">Bandejas</div>
+        <div class="card-value" id="bandejas-valor">3/3</div>
+        <div class="card-sub" id="bandejas-sub">Carga correcta</div>
+      </div>
+      <div class="card fps">
+        <div class="card-label">FPS IA</div>
+        <div><span class="card-value" id="fps-valor">--</span><span class="card-unit">fps</span></div>
+        <div class="card-sub">Visión computacional</div>
+      </div>
+      <div class="card risk">
+        <div class="card-label">Riesgo IA</div>
+        <div><span class="card-value" id="riesgo-valor">--</span><span class="card-unit">%</span></div>
+        <div class="card-sub" id="riesgo-sub">Bajo</div>
+      </div>
+      <div class="card servo">
+        <div class="card-label">Compuerta</div>
+        <div class="card-value" id="servo-valor">Cerrada</div>
+        <div class="card-sub" id="servo-sub">Servo SG90 bloqueado</div>
+      </div>
+      <div class="card cloud">
+        <div class="card-label">Telemetría</div>
+        <div class="card-value" id="sync-valor">1.0s</div>
+        <div class="card-sub" id="sync-sub">Frecuencia de envío</div>
+      </div>
+    </section>
+
+    <section class="main">
+      <div class="panel">
+        <h3>Histórico en vivo <span id="chart-caption">Temperatura y riesgo</span></h3>
+        <div class="chart-wrap">
+          <canvas id="chart" width="900" height="320"></canvas>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Estado del sistema</h3>
+        <div class="info-row"><span>Personas detectadas:</span><span id="personas">0</span></div>
+        <div class="info-row"><span>Operario presente:</span><span id="operario">—</span></div>
+        <div class="info-row"><span>Arduino conectado:</span><span id="arduino">✓ OK</span></div>
+        <div class="info-row"><span>Raspberry Pi:</span><span id="raspberry">✓ IA activa</span></div>
+        <div class="info-row"><span>Modelo IA:</span><span id="modelo">YOLO/MobileNet demo</span></div>
+        <div class="info-row"><span>Última actualización:</span><span id="ultima">—</span></div>
+        <div class="info-row"><span>Estado Arduino CSV:</span><span id="csv-status">simulado</span></div>
+      </div>
+
+      <div class="panel">
+        <h3>Conexión real opcional</h3>
+        <div class="serial-box">
+          <p>El botón <strong>Conectar Arduino USB</strong> usa Web Serial cuando el navegador lo permite. Espera líneas con este formato:</p>
+          <p><code>distancia,temperatura,humedad,bandejas,estado</code></p>
+          <p>Ejemplo: <code>65,28.4,62.0,3,0</code>. Si no conectas nada, el dashboard sigue funcionando con datos normales simulados.</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Eventos recientes</h3>
+        <div class="events" id="eventos-lista"></div>
+      </div>
+    </section>
+
+    <footer>
+      Universidad Mariano Gálvez de Guatemala<br />
+      Arquitectura de Computadoras 1 — Sistema Inteligente de Seguridad para Hornos Industriales
+    </footer>
+  </div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+  const rnd = (min, max) => min + Math.random() * (max - min);
+  const nowLabel = () => new Date().toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+  let mode = 'normal';
+  let tick = 0;
+  let lastState = '';
+  let serialMode = false;
+  let lastTelemetry = null;
+  let history = [];
+  let events = [];
+  let port = null;
+  let reader = null;
+
+  const stateText = {
+    SEGURO: '🔵 HORNO HABILITADO',
+    VACIO_RECIENTE: '🟢 ÁREA VACÍA',
+    OCUPADO: '🔴 OCUPADO / ACCESO RESTRINGIDO',
+    FALLA: '⚠️ FALLA DEL SISTEMA',
+    EMERGENCIA: '🚨 EMERGENCIA',
+    INICIAL: 'Iniciando...'
+  };
+
+  function addEvent(tipo, mensaje, detalle = '') {
+    events.unshift({ tipo, mensaje, detalle, time: new Date() });
+    events = events.slice(0, 24);
+    renderEvents();
+  }
+
+  function renderEvents() {
+    const cont = $('eventos-lista');
+    cont.innerHTML = events.map(e => `
+      <div class="event-item">
+        <div class="event-time">${e.time.toLocaleString('es-GT')}</div>
+        <span class="event-tipo ${e.tipo}">${e.tipo}</span>
+        <strong>${e.mensaje}</strong>${e.detalle ? `<br><span style="color:#94a3b8">${e.detalle}</span>` : ''}
+      </div>
+    `).join('') || '<div style="color:#64748b;text-align:center;padding:22px">Sin eventos todavía</div>';
+  }
+
+  function simulatedTelemetry() {
+    tick += 1;
+    const base = {
+      timestamp: Date.now(),
+      temperatura: 28.0 + Math.sin(tick / 13) * 1.4 + rnd(-0.35, 0.35),
+      humedad: 64 + Math.sin(tick / 15) * 4 + rnd(-1.2, 1.2),
+      pir: 0,
+      distancia_cm: 68 + Math.sin(tick / 10) * 7 + rnd(-2.5, 2.5),
+      luz: 620 + Math.sin(tick / 11) * 70 + rnd(-18, 18),
+      bandejas: 3,
+      personas_detectadas: 0,
+      operarios_presentes: [],
+      fps: 23 + Math.sin(tick / 8) * 2.4 + rnd(-0.8, 0.8),
+      arduino_conectado: true,
+      raspberry_conectado: true,
+      cloud_conectada: true,
+      servo: 'Cerrada',
+      frecuencia_envio: 1.0,
+      source: 'demo'
+    };
+
+    if (mode === 'persona') {
+      base.distancia_cm = rnd(10, 18);
+      base.pir = 1;
+      base.personas_detectadas = 1;
+      base.operarios_presentes = ['Operario A'];
+      base.fps = 21 + rnd(-1, 1);
+    }
+
+    if (mode === 'temperatura') {
+      base.temperatura = 43 + Math.sin(tick / 6) * 3 + rnd(-.6, .6);
+      base.servo = 'Cerrada';
+    }
+
+    if (mode === 'emergencia') {
+      base.temperatura = 66 + Math.sin(tick / 4) * 4 + rnd(-1, 1);
+      base.distancia_cm = rnd(7, 14);
+      base.pir = 1;
+      base.personas_detectadas = 1;
+      base.operarios_presentes = ['No autorizado'];
+      base.bandejas = 1;
+      base.servo = 'Abierta';
+      base.fps = 18 + rnd(-2, 1);
+    }
+
+    if (mode === 'desconexion') {
+      base.arduino_conectado = false;
+      base.raspberry_conectado = false;
+      base.cloud_conectada = false;
+      base.fps = 0;
+      base.source = 'sin señal';
+    }
+
+    return base;
+  }
+
+  function calculateRisk(d) {
+    if (!d.arduino_conectado || !d.raspberry_conectado) return 76;
+    let score = 0;
+    score += clamp((d.temperatura - 32) * 3.5, 0, 40);
+    score += d.distancia_cm > 0 ? clamp((25 - d.distancia_cm) * 2.7, 0, 32) : 12;
+    score += d.pir ? 14 : 0;
+    score += clamp(d.personas_detectadas * 11, 0, 22);
+    score += d.bandejas < 2 ? 16 : d.bandejas < 3 ? 6 : 0;
+    score += d.fps > 0 && d.fps < 16 ? 8 : 0;
+    return Math.round(clamp(score, 0, 100));
+  }
+
+  function inferState(d, risk) {
+    if (mode === 'emergencia' || risk >= 85) return 'EMERGENCIA';
+    if (!d.arduino_conectado || !d.raspberry_conectado) return 'FALLA';
+    if (d.personas_detectadas > 0 || d.pir || d.distancia_cm < 20) return 'OCUPADO';
+    if (risk > 35 || d.temperatura >= 40) return 'VACIO_RECIENTE';
+    return 'SEGURO';
+  }
+
+  function parseArduinoLine(line) {
+    const parts = line.trim().split(',').map(x => x.trim());
+    if (parts.length < 5) return null;
+    const [distancia, temp, hum, bandejas, estadoArduino] = parts.map(Number);
+    if ([distancia, temp, hum, bandejas, estadoArduino].some(Number.isNaN)) return null;
+
+    const emergency = estadoArduino === 9;
+    const personClose = estadoArduino === 2 || distancia < 20;
+    const tempHigh = estadoArduino === 5 || temp > 35;
+
+    return {
+      timestamp: Date.now(),
+      temperatura: temp,
+      humedad: hum,
+      pir: personClose ? 1 : 0,
+      distancia_cm: distancia,
+      luz: 610 + rnd(-35, 35),
+      bandejas,
+      personas_detectadas: personClose ? 1 : 0,
+      operarios_presentes: personClose ? ['Detectado por IA'] : [],
+      fps: emergency ? 18 : 24 + rnd(-2, 2),
+      arduino_conectado: true,
+      raspberry_conectado: true,
+      cloud_conectada: true,
+      servo: (estadoArduino === 1 || emergency) ? 'Abierta' : 'Cerrada',
+      frecuencia_envio: 1.0,
+      source: 'serial',
+      estadoArduino,
+      tempHigh
+    };
+  }
+
+  function updateUI(d) {
+    const risk = calculateRisk(d);
+    const estado = inferState(d, risk);
+
+    $('banner').className = 'banner ' + estado;
+    $('estado-texto').textContent = stateText[estado] || estado;
+    $('estado-subtitulo').textContent = subtitleFor(estado, d, risk);
+
+    $('temp-valor').textContent = d.temperatura.toFixed(1);
+    $('hum-valor').textContent = d.humedad.toFixed(0);
+    $('pir-valor').textContent = d.pir ? 'ACTIVO' : 'INACTIVO';
+    $('dist-valor').textContent = Math.round(d.distancia_cm);
+    $('luz-valor').textContent = Math.round(d.luz);
+    $('bandejas-valor').textContent = `${d.bandejas}/3`;
+    $('fps-valor').textContent = d.fps.toFixed(1);
+    $('riesgo-valor').textContent = risk;
+    $('servo-valor').textContent = d.servo;
+    $('sync-valor').textContent = `${d.frecuencia_envio.toFixed(1)}s`;
+
+    $('temp-sub').textContent = d.temperatura >= 60 ? 'Crítica' : d.temperatura >= 40 ? 'Elevada' : d.temperatura >= 35 ? 'Precaución' : 'Normal';
+    $('dist-sub').textContent = d.distancia_cm < 20 ? 'Persona/objeto demasiado cerca' : 'Radio seguro';
+    $('luz-sub').textContent = `${Math.round((d.luz / 1023) * 100)}% iluminación`;
+    $('bandejas-sub').textContent = d.bandejas >= 3 ? 'Carga correcta' : d.bandejas >= 2 ? 'Carga parcial' : 'Revisar bandejas';
+    $('riesgo-sub').textContent = risk < 25 ? 'Bajo' : risk < 55 ? 'Medio' : risk < 80 ? 'Alto' : 'Crítico';
+    $('servo-sub').textContent = d.servo === 'Abierta' ? 'Acción de seguridad activa' : 'Servo SG90 bloqueado';
+    $('sync-sub').textContent = d.source === 'serial' ? 'Desde Arduino USB' : d.source === 'sin señal' ? 'Sin datos nuevos' : 'Datos demo cada segundo';
+
+    $('personas').textContent = d.personas_detectadas;
+    $('operario').textContent = d.operarios_presentes.length ? d.operarios_presentes.join(', ') : '—';
+    $('arduino').textContent = d.arduino_conectado ? '✓ OK' : '✗ Desconectado';
+    $('raspberry').textContent = d.raspberry_conectado ? '✓ IA activa' : '✗ Sin señal';
+    $('ultima').textContent = new Date(d.timestamp).toLocaleTimeString('es-GT');
+    $('csv-status').textContent = d.source === 'serial' ? `Arduino: ${d.estadoArduino ?? 'OK'}` : d.source;
+
+    $('arduino-chip').className = 'chip ' + (d.arduino_conectado ? 'live' : 'dead');
+    $('arduino-chip').textContent = d.arduino_conectado ? 'Arduino OK' : 'Arduino desconectado';
+    $('rpi-chip').className = 'chip ' + (d.raspberry_conectado ? 'live' : 'dead');
+    $('rpi-chip').textContent = d.raspberry_conectado ? 'Raspberry Pi OK' : 'Raspberry Pi sin señal';
+    $('cloud-chip').className = 'chip ' + (d.cloud_conectada ? 'live' : 'dead');
+    $('cloud-chip').textContent = d.cloud_conectada ? 'Cloud sincronizada' : 'Cloud offline';
+    $('source-chip').textContent = d.source === 'serial' ? 'Arduino USB en vivo' : d.source === 'sin señal' ? 'Sin conexión' : 'Modo lectura activo';
+    $('source-chip').className = 'chip ' + (d.source === 'serial' ? 'live' : d.source === 'sin señal' ? 'dead' : 'demo');
+
+    $('risk-bar').style.width = `${risk}%`;
+    $('diagnostico').textContent = diagnosisFor(risk, estado);
+    $('diagnostico-nota').textContent = noteFor(risk, estado);
+    $('prediccion').textContent = predictionFor(risk, d);
+    $('prediccion-nota').textContent = d.source === 'serial'
+      ? 'Predicción calculada con telemetría real recibida por USB.'
+      : 'Predicción calculada con datos simulados de operación normal.';
+
+    if (estado !== lastState) {
+      const tipo = estado === 'SEGURO' ? 'OK' : estado === 'EMERGENCIA' ? 'EMERGENCIA' : estado === 'FALLA' ? 'ALERTA' : 'IA';
+      addEvent(tipo, `Cambio de estado: ${estado}`, `Riesgo IA ${risk}%, temperatura ${d.temperatura.toFixed(1)}°C, distancia ${Math.round(d.distancia_cm)} cm`);
+      lastState = estado;
+    } else if (tick % 10 === 0 && estado === 'SEGURO') {
+      addEvent('OK', 'Monitoreo normal', `Sensores estables: T ${d.temperatura.toFixed(1)}°C, bandejas ${d.bandejas}/3, FPS ${d.fps.toFixed(1)}`);
+    }
+
+    history.push({ t: new Date(d.timestamp), temp: d.temperatura, risk });
+    history = history.slice(-70);
+    drawChart();
+  }
+
+  function subtitleFor(estado, d, risk) {
+    if (estado === 'SEGURO') return 'Condición normal: sin presencia en zona de riesgo, temperatura estable y comunicación activa.';
+    if (estado === 'VACIO_RECIENTE') return `Precaución inteligente: temperatura ${d.temperatura.toFixed(1)}°C o riesgo ${risk}%. Verificando antes de habilitar.`;
+    if (estado === 'OCUPADO') return `${d.personas_detectadas || 1} presencia detectada en el área. El horno queda restringido.`;
+    if (estado === 'FALLA') return 'Se perdió comunicación con Arduino, Raspberry Pi o la nube. Revisar conexión.';
+    if (estado === 'EMERGENCIA') return 'Protocolo de emergencia activo: alarma, compuerta segura y aviso al supervisor.';
+    return 'Sistema activo.';
+  }
+
+  function diagnosisFor(risk, estado) {
+    if (estado === 'EMERGENCIA') return 'Riesgo crítico';
+    if (estado === 'FALLA') return 'Telemetría incompleta';
+    if (risk < 25) return 'Operación segura';
+    if (risk < 55) return 'Precaución';
+    if (risk < 80) return 'Riesgo alto';
+    return 'Riesgo crítico';
+  }
+
+  function noteFor(risk, estado) {
+    if (estado === 'FALLA') return 'El sistema conserva el último estado y solicita revisión de conectividad.';
+    if (risk < 25) return 'Probabilidad de riesgo baja durante los próximos minutos.';
+    if (risk < 55) return 'Mantener observación y validar sensores de presencia.';
+    return 'Se recomienda bloquear operación hasta confirmar condiciones seguras.';
+  }
+
+  function predictionFor(risk, d) {
+    if (!d.arduino_conectado || !d.raspberry_conectado) return 'Revisión inmediata';
+    if (risk < 25) return '5 min estables';
+    if (risk < 55) return 'Verificar antes de operar';
+    if (risk < 80) return 'Bloqueo recomendado';
+    return 'Emergencia activa';
+  }
+
+  function drawChart() {
+    const canvas = $('chart');
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    ctx.fillStyle = '#172033';
+    ctx.fillRect(0, 0, w, h);
+
+    const pad = 34;
+    ctx.strokeStyle = 'rgba(148, 163, 184, .18)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+      const y = pad + (h - pad * 2) * (i / 4);
+      ctx.beginPath();
+      ctx.moveTo(pad, y);
+      ctx.lineTo(w - pad, y);
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '12px system-ui';
+    ctx.fillText('Temp °C', pad, 18);
+    ctx.fillText('Riesgo %', w - 95, 18);
+
+    if (history.length < 2) return;
+    const xFor = (i) => pad + (w - pad * 2) * (i / (history.length - 1));
+    const yTemp = (v) => h - pad - clamp((v - 20) / 55, 0, 1) * (h - pad * 2);
+    const yRisk = (v) => h - pad - clamp(v / 100, 0, 1) * (h - pad * 2);
+
+    drawLine(ctx, history.map((p, i) => [xFor(i), yTemp(p.temp)]), '#fb923c');
+    drawLine(ctx, history.map((p, i) => [xFor(i), yRisk(p.risk)]), '#ef4444');
+
+    const latest = history[history.length - 1];
+    ctx.fillStyle = '#e2e8f0';
+    ctx.fillText(`${latest.temp.toFixed(1)}°C`, w - 142, yTemp(latest.temp) - 8);
+    ctx.fillText(`${latest.risk}%`, w - 92, yRisk(latest.risk) - 8);
+  }
+
+  function drawLine(ctx, points, color) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    points.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+    ctx.stroke();
+  }
+
+  function setMode(nextMode) {
+    mode = nextMode;
+    serialMode = false;
+    document.querySelectorAll('[data-mode]').forEach(btn => btn.classList.toggle('active', btn.dataset.mode === mode));
+    addEvent(mode === 'normal' ? 'OK' : mode === 'emergencia' ? 'EMERGENCIA' : 'ALERTA', `Modo cambiado a ${mode}`, 'Simulación local del tablero');
+  }
+
+  async function connectSerial() {
+    if (!('serial' in navigator)) {
+      addEvent('ALERTA', 'Web Serial no disponible', 'Usa Chrome/Edge en HTTPS o localhost. Continúa el modo demo.');
+      return;
+    }
+    try {
+      port = await navigator.serial.requestPort();
+      await port.open({ baudRate: 9600 });
+      serialMode = true;
+      mode = 'normal';
+      document.querySelectorAll('[data-mode]').forEach(btn => btn.classList.remove('active'));
+      $('source-chip').textContent = 'Arduino USB en vivo';
+      $('source-chip').className = 'chip live';
+      addEvent('OK', 'Arduino USB conectado', 'Leyendo telemetría CSV a 9600 baudios.');
+      readSerialLoop();
+    } catch (err) {
+      addEvent('ALERTA', 'No se pudo conectar Arduino', String(err.message || err));
+    }
+  }
+
+  async function readSerialLoop() {
+    const decoder = new TextDecoderStream();
+    port.readable.pipeTo(decoder.writable).catch(() => {});
+    reader = decoder.readable.getReader();
+    let buffer = '';
+    try {
+      while (serialMode) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += value;
+        const lines = buffer.split(/\r?\n/);
+        buffer = lines.pop() || '';
+        for (const line of lines) {
+          const parsed = parseArduinoLine(line);
+          if (parsed) lastTelemetry = parsed;
+        }
+      }
+    } catch (err) {
+      addEvent('ALERTA', 'Lectura serial detenida', String(err.message || err));
+      serialMode = false;
+    }
+  }
+
+  document.querySelectorAll('[data-mode]').forEach(btn => {
+    btn.addEventListener('click', () => setMode(btn.dataset.mode));
+  });
+
+  $('btn-reset').addEventListener('click', () => {
+    events = [];
+    lastState = '';
+    addEvent('OK', 'Eventos reiniciados', 'Tablero listo para la demostración.');
+  });
+
+  $('btn-serial').addEventListener('click', connectSerial);
+
+  window.addEventListener('resize', drawChart);
+
+  addEvent('OK', 'Dashboard iniciado', 'Modo demo con datos normales de Arduino + Raspberry Pi.');
+  updateUI(simulatedTelemetry());
+
+  setInterval(() => {
+    const data = serialMode && lastTelemetry ? lastTelemetry : simulatedTelemetry();
+    updateUI(data);
+  }, 1000);
+})();
+</script>
+</body>
+</html>
