@@ -1678,6 +1678,7 @@
     const stateClass = report.state === 'safe' ? 'ok' : report.state === 'attention' || report.state === 'restricted' ? 'warn' : report.state === 'failure' ? 'neutral' : 'danger';
     const trend = getTrendSummary(report.history);
     const recommendations = recommendationForReport(report.state, report.risk);
+    const faviconHref = new URL('icons/horno.jpg', window.location.href).href;
     const eventRows = report.events.slice(0, 8).map((event, index) => {
       const detail = event.desc ? escapeHTML(event.desc).slice(0, 95) : '';
       return `
